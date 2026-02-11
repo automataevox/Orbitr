@@ -8,10 +8,9 @@
 
 > ⚠️ **Status**: Active Development | Production-ready Docker deployment available | Core features working | Extensions system in progress
 
-[![GitHub Stars](https://img.shields.io/github/stars/orbitr/orbitr?style=for-the-badge)](https://github.com/orbitr/orbitr/stargazers)
-[![License](https://img.shields.io/github/license/orbitr/orbitr?style=for-the-badge)](./LICENSE)
-[![Docker Pulls](https://img.shields.io/docker/pulls/orbitr/orbitr?style=for-the-badge)](https://hub.docker.com/r/orbitr/orbitr)
-[![Discord](https://img.shields.io/discord/0000000000?style=for-the-badge)](https://discord.gg/orbitr)
+[![GitHub Stars](https://img.shields.io/github/stars/automataevox/orbitr?style=for-the-badge)](https://github.com/orbitr/orbitr/stargazers)
+[![License](https://img.shields.io/github/license/automataevox/orbitr?style=for-the-badge)](./LICENSE)
+[![Docker Pulls](https://img.shields.io/docker/pulls/automataevox/orbitr?style=for-the-badge)](https://hub.docker.com/r/orbitr/orbitr)
 
 [**Quick Start**](#-quick-start) • [**Production Setup**](./PRODUCTION.md) • [**Documentation**](#-documentation) • [**Roadmap**](#-roadmap)
 
