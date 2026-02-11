@@ -390,8 +390,8 @@ Orbitr is open source software licensed under the [MIT License](./LICENSE).
 
 Orbitr is made possible by our amazing community and sponsors:
 
-<a href="https://github.com/sponsors/orbitr">
-  <img src="https://img.shields.io/github/sponsors/orbitr?style=for-the-badge" alt="GitHub Sponsors" />
+<a href="https://github.com/sponsors/automataevox">
+  <img src="https://img.shields.io/github/sponsors/automataevox?style=for-the-badge" alt="GitHub Sponsors" />
 </a>
 
 ---
@@ -411,6 +411,6 @@ Special thanks to:
 
 **Built with ❤️ for the self-hosting community**
 
-[⭐ Star us on GitHub](https://github.com/orbitr/orbitr) • [🚀 Get Started](#-quick-start) • [📚 Read the Docs](./docs)
+[⭐ Star us on GitHub](https://github.com/automataevox/orbitr) • [🚀 Get Started](#-quick-start) • [📚 Read the Docs](./docs)
 
 </div>
