@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${EXTENSION_ID}-postgres
+    restart: unless-stopped
+    
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-orbitr}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    
+    volumes:
+      - ${VOLUME_DATA}:/var/lib/postgresql/data
+    
+    ports:
+      - "${PORT:-5432}:5432"
+    
+    networks:
+      - orbitr-network
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    
+    labels:
+      - "orbitr.managed=true"
+      - "orbitr.extension=${EXTENSION_ID}"
+      - "orbitr.extension.name=PostgreSQL"
+      - "orbitr.extension.type=app"
+
+networks:
+  orbitr-network:
+    external: true

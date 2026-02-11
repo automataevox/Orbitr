@@ -1,0 +1,82 @@
+id: mongodb
+name: MongoDB
+author: Orbitr Team
+description: MongoDB is a source-available cross-platform document-oriented database program.
+type: database
+version: 7.0.0
+icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg
+repository: https://github.com/orbitr/extensions/tree/main/mongodb
+tags:
+  - database
+  - nosql
+  - document
+  - mongodb
+
+environment:
+  - name: MONGO_INITDB_ROOT_USERNAME
+    label: Root Username
+    description: MongoDB root username
+    type: string
+    required: true
+    default: "admin"
+
+  - name: MONGO_INITDB_ROOT_PASSWORD
+    label: Root Password
+    description: MongoDB root password
+    type: string
+    required: true
+    secret: true
+
+  - name: MONGO_INITDB_DATABASE
+    label: Initial Database
+    description: Name of the initial database
+    type: string
+    required: false
+    default: "app"
+
+volumes:
+  - container: /data/db
+    description: MongoDB data directory
+  - container: /data/configdb
+    description: MongoDB configuration directory
+
+ports:
+  - container: 27017
+    host: 27017
+    protocol: tcp
+    description: MongoDB server port
+
+healthCheck:
+  type: command
+  command: mongosh --eval "db.adminCommand('ping')"
+  interval: 30
+  timeout: 10
+  retries: 3
+
+requirements:
+  minMemory: 512
+  minCpu: 0.5
+
+compose:
+  version: "3.8"
+  services:
+    mongodb:
+      image: mongo:7.0
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+        MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      volumes:
+        - mongodb_data:/data/db
+        - mongodb_config:/data/configdb
+      ports:
+        - "27017:27017"
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+  volumes:
+    mongodb_data:
+    mongodb_config:

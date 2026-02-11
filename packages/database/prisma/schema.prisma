@@ -1,0 +1,702 @@
+// Orbitr Database Schema (Prisma)
+// This is the complete production-grade schema for the Orbitr platform
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// CONTAINER MANAGEMENT
+// ============================================================================
+
+model Container {
+  id       String   @id @default(cuid())
+  
+  // Docker identifiers
+  dockerId String   @unique // Docker container ID (64-char hash)
+  name     String   // Container name
+  image    String   // Image name with tag (e.g., "postgres:16")
+  
+  // Container status
+  status   String   // running, stopped, paused, exited, dead, restarting
+  state    String?    // Full Docker inspect state (config, mounts, network, etc.)
+  
+  // Resource configuration
+  cpuLimit    Float?   // CPU limit (cores)
+  memoryLimit BigInt?  // Memory limit (bytes)
+  
+  // Relationships
+  extensionId String?
+  extension   Extension? @relation(fields: [extensionId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  labels      String?    // Docker labels
+  environment String?    // Environment variables
+  ports       String?    // Port mappings [{container: 80, host: 8080, protocol: 'tcp'}]
+  volumes     String?    // Volume mounts [{source: 'vol_name', target: '/data'}]
+  networks    String?    // Network connections [{name: 'orbitr-network', ip: '172.18.0.2'}]
+  command     String?  // Container command override
+  entrypoint  String?  // Entrypoint override
+  
+  // Health monitoring
+  healthStatus    String?   // healthy, unhealthy, starting, none
+  lastHealthCheck DateTime?
+  restartCount    Int       @default(0)
+  restartPolicy   String?   // no, always, on-failure, unless-stopped
+  
+  // Lifecycle timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  
+  // Relations
+  logs            Log[]
+  healthChecks    HealthCheck[]
+  stats           ContainerStats[]
+  
+  @@index([dockerId])
+  @@index([extensionId])
+  @@index([status])
+  @@index([name])
+}
+
+// Container resource usage statistics
+model ContainerStats {
+  id          String    @id @default(cuid())
+  containerId String
+  container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  
+  // CPU stats
+  cpuPercent  Float     // CPU usage percentage
+  cpuDelta    BigInt    // CPU delta
+  systemDelta BigInt    // System CPU delta
+  
+  // Memory stats
+  memoryUsage BigInt    // Current memory usage (bytes)
+  memoryLimit BigInt    // Memory limit (bytes)
+  memoryPercent Float   // Memory usage percentage
+  
+  // Network stats
+  networkRx   BigInt    // Network bytes received
+  networkTx   BigInt    // Network bytes transmitted
+  
+  // Block I/O stats
+  blockRead   BigInt    // Block I/O read (bytes)
+  blockWrite  BigInt    // Block I/O write (bytes)
+  
+  // PIDs
+  pids        Int       // Number of PIDs
+  
+  timestamp   DateTime  @default(now())
+  
+  @@index([containerId, timestamp])
+}
+
+// ============================================================================
+// EXTENSION SYSTEM
+// ============================================================================
+
+model Extension {
+  id              String   @id @default(cuid())
+  
+  // Extension identification
+  extensionId     String   // Unique extension ID (e.g., "postgresql")
+  name            String   // Display name
+  version         String   // Semantic version (e.g., "1.0.0")
+  description     String?
+  author          String     // {name, email, url}
+  icon            String?  // Icon URL or base64
+  
+  // Extension metadata
+  type            String   // app, tool, integration, theme
+  categories      String     // Array of categories
+  tags            String?    // Array of tags
+  
+  // Installation details
+  installPath     String   // Path to extension files
+  manifest        String     // Full manifest.json content
+  config          String     // User-provided configuration
+  
+  // Source information
+  source          String?  // git, registry, local
+  sourceUrl       String?  // Git URL or registry URL
+  repositoryUrl   String?
+  
+  // Status
+  status          String   // installing, running, stopped, failed, updating, uninstalling
+  enabled         Boolean  @default(true)
+  autoStart       Boolean  @default(true)
+  
+  // Reverse proxy configuration
+  proxyEnabled    Boolean  @default(false)
+  proxyConfig     String?    // Proxy configuration from manifest
+  subdomain       String?  @unique
+  customDomain    String?
+  
+  // Health monitoring
+  healthCheckEnabled Boolean @default(false)
+  healthStatus       String? // healthy, unhealthy, starting
+  
+  // Lifecycle timestamps
+  installedAt     DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  lastStartedAt   DateTime?
+  lastStoppedAt   DateTime?
+  lastCheckedAt   DateTime? // Last check for updates
+  
+  // Relations
+  containers      Container[]
+  settings        ExtensionSetting[]
+  dependencies    ExtensionDependency[] @relation("Extension")
+  dependents      ExtensionDependency[] @relation("DependsOn")
+  
+  @@unique([extensionId, version])
+  @@index([extensionId])
+  @@index([status])
+  @@index([enabled])
+  @@index([installedAt])
+}
+
+// Extension-specific settings (key-value store)
+model ExtensionSetting {
+  id          String    @id @default(cuid())
+  extensionId String
+  extension   Extension @relation(fields: [extensionId], references: [id], onDelete: Cascade)
+  
+  key         String
+  value       String    // Stored as string, parse as needed
+  encrypted   Boolean   @default(false)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([extensionId, key])
+  @@index([extensionId])
+}
+
+// Extension dependencies
+model ExtensionDependency {
+  id              String    @id @default(cuid())
+  
+  extensionId     String
+  extension       Extension @relation("Extension", fields: [extensionId], references: [id], onDelete: Cascade)
+  
+  dependsOnId     String
+  dependsOn       Extension @relation("DependsOn", fields: [dependsOnId], references: [id], onDelete: Restrict)
+  
+  versionRange    String    // Semver range (e.g., "^1.0.0")
+  required        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([extensionId, dependsOnId])
+  @@index([extensionId])
+  @@index([dependsOnId])
+}
+
+// ============================================================================
+// HEALTH MONITORING
+// ============================================================================
+
+model HealthCheck {
+  id            String    @id @default(cuid())
+  containerId   String
+  container     Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  
+  // Check configuration
+  type          String    // http, tcp, docker, custom
+  config        String      // Type-specific configuration
+  interval      Int       @default(30) // Check interval in seconds
+  timeout       Int       @default(5)  // Timeout in seconds
+  retries       Int       @default(3)  // Number of retries before unhealthy
+  startPeriod   Int       @default(60) // Grace period in seconds
+  
+  // Current status
+  status        String    // healthy, unhealthy, starting, unknown
+  lastCheck     DateTime?
+  lastSuccess   DateTime?
+  lastFailure   DateTime?
+  lastError     String?   // Last error message
+  
+  // Statistics
+  consecutiveFailures Int @default(0)
+  consecutiveSuccesses Int @default(0)
+  totalChecks        Int @default(0)
+  totalFailures      Int @default(0)
+  averageResponseTime Float? // Average response time in ms
+  
+  // Configuration
+  enabled       Boolean   @default(true)
+  alertOnFailure Boolean  @default(true)
+  restartOnFailure Boolean @default(false)
+  maxRestarts   Int       @default(3)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([containerId])
+  @@index([status])
+  @@index([enabled])
+}
+
+// ============================================================================
+// LOGGING
+// ============================================================================
+
+model Log {
+  id          String    @id @default(cuid())
+  containerId String
+  container   Container @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  
+  timestamp   DateTime  @default(now())
+  stream      String    // stdout, stderr
+  message     String    // Log message
+  
+  // Metadata
+  level       String?   // info, warn, error, debug (parsed if possible)
+  source      String?   // Source component (if parseable)
+  
+  @@index([containerId, timestamp(sort: Desc)])
+  @@index([timestamp(sort: Desc)])
+}
+
+// ============================================================================
+// REVERSE PROXY
+// ============================================================================
+
+model ProxyRoute {
+  id          String   @id @default(cuid())
+  
+  // Route identification
+  name        String   @unique
+  
+  // Routing configuration
+  domain      String?  // Full domain (e.g., "example.com")
+  subdomain   String?  // Subdomain only (e.g., "app" -> "app.example.com")
+  path        String?  // Path-based routing (e.g., "/app")
+  
+  // Target configuration
+  targetHost  String   // Container name or IP
+  targetPort  Int      // Target port
+  targetScheme String  @default("http") // http, https
+  
+  // SSL/TLS configuration
+  sslEnabled  Boolean  @default(true)
+  forceHttps  Boolean  @default(true)
+  certPath    String?  // Path to certificate
+  certType    String?  // letsencrypt, custom, self-signed
+  
+  // Advanced configuration
+  middleware  String?    // Middleware configuration (auth, rate-limit, etc.)
+  headers     String?    // Custom headers
+  rewrites    String?    // URL rewrites
+  
+  // Status
+  enabled     Boolean  @default(true)
+  
+  // Metadata
+  extensionId String?  // Associated extension
+  description String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([domain, subdomain])
+  @@index([enabled])
+}
+
+// ============================================================================
+// SYSTEM CONFIGURATION
+// ============================================================================
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  
+  // Setting identification
+  key       String   @unique
+  value     String   // JSON-encoded value
+  encrypted Boolean  @default(false)
+  
+  // Metadata
+  category  String?  // general, docker, proxy, security, notifications
+  description String?
+  
+  updatedAt DateTime @updatedAt
+  
+  @@index([category])
+}
+
+// System-level audit logging
+model AuditLog {
+  id        String   @id @default(cuid())
+  
+  // Event details
+  event     String   // Event type (container.started, extension.installed, etc.)
+  action    String   // Action performed (create, update, delete, start, stop)
+  resource  String   // Resource type (container, extension, system)
+  resourceId String? // Resource ID
+  
+  // Actor (future: user system integration)
+  userId    String?  // User ID (if authentication enabled)
+  ipAddress String?  // Request IP address
+  userAgent String?  // User agent string
+  
+  // Event data
+  metadata  String?    // Additional event metadata
+  changes   String?    // Before/after changes
+  
+  // Result
+  success   Boolean  @default(true)
+  error     String?  // Error message if failed
+  duration  Int?     // Operation duration in ms
+  
+  timestamp DateTime @default(now())
+  
+  @@index([event])
+  @@index([resource, resourceId])
+  @@index([timestamp(sort: Desc)])
+  @@index([userId])
+}
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+model Notification {
+  id          String   @id @default(cuid())
+  
+  // Notification details
+  type        String   // info, warning, error, success
+  title       String
+  message     String
+  
+  // Related resource
+  resourceType String? // container, extension, system
+  resourceId   String? // Related resource ID
+  
+  // Status
+  read        Boolean  @default(false)
+  dismissed   Boolean  @default(false)
+  
+  // Actions
+  actionUrl   String?  // Action URL (e.g., link to container page)
+  actionLabel String?  // Action button label
+  
+  // User (future: multi-user support)
+  userId      String?
+  
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime? // Auto-dismiss after expiration
+  
+  @@index([read, dismissed])
+  @@index([createdAt(sort: Desc)])
+  @@index([userId])
+  @@index([resourceType, resourceId])
+}
+
+// ============================================================================
+// MARKETPLACE
+// ============================================================================
+
+model ExtensionRegistry {
+  id            String   @id @default(cuid())
+  
+  // Extension information (from registry)
+  extensionId   String   @unique
+  name          String
+  description   String
+  author        String     // {name, email, url}
+  version       String   // Latest available version
+  
+  // Marketplace metadata
+  type          String   // app, tool, integration, theme
+  categories    String     // Array of categories
+  tags          String?    // Array of tags
+  icon          String?
+  screenshots   String?    // Array of screenshot URLs
+  
+  // Documentation
+  readme        String?  // README content
+  documentation String?  // Documentation URL
+  website       String?
+  
+  // Statistics
+  downloads     Int      @default(0)
+  rating        Float?   // Average rating (0-5)
+  ratingCount   Int      @default(0)
+  verified      Boolean  @default(false)
+  featured      Boolean  @default(false)
+  
+  // Source
+  manifestUrl   String   // URL to manifest.json
+  repositoryUrl String?  // Git repository URL
+  
+  // Cache control
+  lastFetched   DateTime @default(now())
+  cacheExpiry   DateTime
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([featured, verified])
+  @@index([categories])
+}
+
+// User extension ratings (future: multi-user support)
+model ExtensionRating {
+  id          String   @id @default(cuid())
+  
+  extensionId String
+  userId      String
+  
+  rating      Int      // 1-5 stars
+  review      String?  // Optional review text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([extensionId, userId])
+  @@index([extensionId])
+}
+
+// ============================================================================
+// BACKUP & RESTORE
+// ============================================================================
+
+model Backup {
+  id          String   @id @default(cuid())
+  
+  // Backup metadata
+  name        String
+  description String?
+  type        String   @default("full") // full, extensions, data, config
+  
+  // Contents
+  includesExtensions Boolean @default(true)
+  includesData       Boolean @default(true)
+  includesSettings   Boolean @default(true)
+  includedExtensions String?   // Array of extension IDs
+  
+  // Storage
+  filePath    String   // Path to backup file
+  size        BigInt   // Backup size in bytes
+  compressed  Boolean  @default(true)
+  
+  // Backup information
+  platformVersion String // Orbitr version at backup time
+  metadata    String?    // Additional metadata
+  
+  // Status
+  status      String   // creating, completed, failed, restoring
+  error       String?  // Error message if failed
+  
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([createdAt(sort: Desc)])
+  @@index([status])
+}
+
+// ============================================================================
+// NETWORKING
+// ============================================================================
+
+model Network {
+  id       String   @id @default(cuid())
+  
+  // Docker network details
+  dockerId String   @unique
+  name     String   @unique
+  driver   String   // bridge, overlay, host, macvlan
+  
+  // Configuration
+  subnet   String?
+  gateway  String?
+  ipRange  String?
+  
+  // Options
+  internal Boolean  @default(false)
+  attachable Boolean @default(false)
+  ingress  Boolean  @default(false)
+  
+  // Metadata
+  labels   String?
+  options  String?    // Driver-specific options
+  
+  // Relations
+  containers String?  // Array of connected container IDs
+  
+  createdAt DateTime @default(now())
+  
+  @@index([name])
+}
+
+// ============================================================================
+// VOLUMES
+// ============================================================================
+
+model Volume {
+  id       String   @id @default(cuid())
+  
+  // Docker volume details
+  dockerId String   @unique
+  name     String   @unique
+  driver   String   @default("local")
+  
+  // Configuration
+  mountpoint String  // Host mount point
+  
+  // Options
+  options  String?    // Driver-specific options
+  labels   String?
+  
+  // Status
+  scope    String   @default("local") // local, global
+  
+  // Metadata
+  size     BigInt?  // Volume size in bytes (if available)
+  
+  // Relations  
+  containers String?  // Array of container IDs using this volume
+  
+  createdAt DateTime @default(now())
+  
+  @@index([name])
+}
+
+// ============================================================================
+// WEBHOOKS
+// ============================================================================
+
+model Webhook {
+  id          String   @id @default(cuid())
+  
+  // Webhook configuration
+  name        String
+  url         String   // Webhook URL
+  secret      String?  // Webhook secret for validation
+  
+  // Event filters
+  events      String     // Array of event types to trigger on
+  filters     String?    // Additional filters (e.g., specific containers)
+  
+  // Status
+  enabled     Boolean  @default(true)
+  
+  // Statistics
+  lastTriggered DateTime?
+  triggerCount  Int      @default(0)
+  failureCount  Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([enabled])
+}
+
+model WebhookDelivery {
+  id          String   @id @default(cuid())
+  webhookId   String
+  
+  // Request details
+  event       String
+  payload     String
+  
+  // Response details
+  statusCode  Int?
+  responseBody String?
+  error       String?
+  duration    Int?     // Duration in ms
+  
+  // Status
+  success     Boolean  @default(false)
+  retries     Int      @default(0)
+  
+  deliveredAt DateTime @default(now())
+  
+  @@index([webhookId, deliveredAt(sort: Desc)])
+}
+
+// ============================================================================
+// USERS & AUTHENTICATION (Optional - Phase 3)
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  
+  // Authentication
+  email         String    @unique
+  username      String?   @unique
+  passwordHash  String?   // Hashed password (if local auth)
+  
+  // Profile
+  name          String?
+  avatar        String?
+  
+  // OAuth (if using NextAuth)
+  emailVerified DateTime?
+  
+  // Status
+  active        Boolean   @default(true)
+  role          String    @default("user") // user, admin
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Relations
+  sessions      Session[]
+  accounts      Account[]
+  
+  @@index([email])
+  @@index([username])
+}
+
+// NextAuth session model
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+// NextAuth account model
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// Account verification tokens
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  
+  @@unique([identifier, token])
+}

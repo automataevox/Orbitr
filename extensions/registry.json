@@ -1,0 +1,307 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-02-11T00:00:00Z",
+  "extensions": [
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL",
+      "version": "16.1.0",
+      "author": {
+        "name": "Orbitr Team",
+        "email": "extensions@orbitr.io"
+      },
+      "type": "app",
+      "categories": ["database"],
+      "tags": ["sql", "postgres", "database"],
+      "verified": true,
+      "featured": true,
+      "downloads": 12543,
+      "rating": 4.8,
+      "ratingCount": 342,
+      "description": "PostgreSQL is a powerful, open source object-relational database system.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/postgresql/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/postgresql/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/postgresql"
+    },
+    {
+      "id": "redis",
+      "name": "Redis",
+      "version": "7.2.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["database", "cache"],
+      "tags": ["cache", "redis", "nosql"],
+      "verified": true,
+      "featured": true,
+      "downloads": 8234,
+      "rating": 4.9,
+      "ratingCount": 201,
+      "description": "Redis is an in-memory data structure store, used as a database, cache, and message broker.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/redis/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/redis/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/redis"
+    },
+    {
+      "id": "mysql",
+      "name": "MySQL",
+      "version": "8.0.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["database"],
+      "tags": ["sql", "mysql", "database"],
+      "verified": true,
+      "featured": true,
+      "downloads": 12456,
+      "rating": 4.7,
+      "ratingCount": 356,
+      "description": "MySQL is the world's most popular open source relational database.",
+      "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/mysql/manifest.yaml",
+      "repositoryUrl": "https://github.com/orbitr/extensions/mysql"
+    },
+    {
+      "id": "mongodb",
+      "name": "MongoDB",
+      "version": "7.0.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["database"],
+      "tags": ["nosql", "mongodb", "database", "document"],
+      "verified": true,
+      "featured": true,
+      "downloads": 14567,
+      "rating": 4.6,
+      "ratingCount": 412,
+      "description": "MongoDB is a source-available cross-platform document-oriented database program.",
+      "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/mongodb/manifest.yaml",
+      "repositoryUrl": "https://github.com/orbitr/extensions/mongodb"
+    },
+    {
+      "id": "nginx",
+      "name": "Nginx",
+      "version": "1.25.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["networking"],
+      "tags": ["web-server", "reverse-proxy", "http"],
+      "verified": true,
+      "featured": true,
+      "downloads": 22134,
+      "rating": 4.8,
+      "ratingCount": 567,
+      "description": "Nginx is a high-performance HTTP server, reverse proxy, and load balancer.",
+      "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/nginx/manifest.yaml",
+      "repositoryUrl": "https://github.com/orbitr/extensions/nginx"
+    },
+    {
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.2.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["monitoring"],
+      "tags": ["monitoring", "analytics", "visualization"],
+      "verified": true,
+      "featured": false,
+      "downloads": 9876,
+      "rating": 4.7,
+      "ratingCount": 298,
+      "description": "Grafana is the open source analytics and monitoring platform.",
+      "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/grafana/manifest.yaml",
+      "repositoryUrl": "https://github.com/orbitr/extensions/grafana"
+    },
+    {
+      "id": "n8n",
+      "name": "n8n",
+      "version": "1.19.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["automation"],
+      "tags": ["automation", "workflow", "integration"],
+      "verified": true,
+      "featured": true,
+      "downloads": 7234,
+      "rating": 4.9,
+      "ratingCount": 189,
+      "description": "n8n is a fair-code licensed workflow automation platform.",
+      "icon": "https://docs.n8n.io/img/n8n-logo.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/n8n/manifest.yaml",
+      "repositoryUrl": "https://github.com/orbitr/extensions/n8n"
+    },
+    {
+      "id": "plex",
+      "name": "Plex Media Server",
+      "version": "1.40.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["media"],
+      "tags": ["media", "streaming", "video"],
+      "verified": true,
+      "featured": true,
+      "downloads": 15678,
+      "rating": 4.7,
+      "ratingCount": 523,
+      "description": "Stream movies, TV shows, music, and photos to all your devices.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/plex/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/plex/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/plex"
+    },
+    {
+      "id": "nextcloud",
+      "name": "Nextcloud",
+      "version": "28.0.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["productivity"],
+      "tags": ["cloud", "storage", "files"],
+      "verified": true,
+      "featured": true,
+      "downloads": 9834,
+      "rating": 4.6,
+      "ratingCount": 412,
+      "description": "A safe home for all your data. Access & share your files, calendars, contacts, mail & more.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/nextcloud/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/nextcloud/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/nextcloud"
+    },
+    {
+      "id": "vaultwarden",
+      "name": "Vaultwarden",
+      "version": "1.30.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["security"],
+      "tags": ["password", "security", "vault"],
+      "verified": true,
+      "featured": false,
+      "downloads": 7123,
+      "rating": 4.9,
+      "ratingCount": 289,
+      "description": "Unofficial Bitwarden compatible server written in Rust, perfect for self-hosting.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/vaultwarden/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/vaultwarden/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/vaultwarden"
+    },
+    {
+      "id": "home-assistant",
+      "name": "Home Assistant",
+      "version": "2024.2.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["automation"],
+      "tags": ["smarthome", "automation", "iot"],
+      "verified": true,
+      "featured": false,
+      "downloads": 6745,
+      "rating": 4.8,
+      "ratingCount": 334,
+      "description": "Open source home automation that puts local control and privacy first.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/home-assistant/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/home-assistant/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/home-assistant"
+    },
+    {
+      "id": "jellyfin",
+      "name": "Jellyfin",
+      "version": "10.8.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["media"],
+      "tags": ["media", "streaming", "video"],
+      "verified": true,
+      "featured": false,
+      "downloads": 11234,
+      "rating": 4.7,
+      "ratingCount": 445,
+      "description": "The Free Software Media System - put you in control of managing and streaming your media.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/jellyfin/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/jellyfin/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/jellyfin"
+    },
+    {
+      "id": "adguard",
+      "name": "AdGuard Home",
+      "version": "0.107.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["networking"],
+      "tags": ["dns", "adblock", "privacy"],
+      "verified": true,
+      "featured": false,
+      "downloads": 5432,
+      "rating": 4.8,
+      "ratingCount": 223,
+      "description": "Network-wide software for blocking ads & tracking.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/adguard/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/adguard/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/adguard"
+    },
+    {
+      "id": "uptime-kuma",
+      "name": "Uptime Kuma",
+      "version": "1.23.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "app",
+      "categories": ["monitoring"],
+      "tags": ["monitoring", "uptime", "alerts"],
+      "verified": true,
+      "featured": false,
+      "downloads": 4567,
+      "rating": 4.9,
+      "ratingCount": 178,
+      "description": "A fancy self-hosted monitoring tool like Uptime Robot.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/uptime-kuma/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/uptime-kuma/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/uptime-kuma"
+    },
+    {
+      "id": "portainer",
+      "name": "Portainer",
+      "version": "2.19.0",
+      "author": {
+        "name": "Orbitr Team"
+      },
+      "type": "tool",
+      "categories": ["development"],
+      "tags": ["docker", "containers", "management"],
+      "verified": true,
+      "featured": false,
+      "downloads": 8901,
+      "rating": 4.5,
+      "ratingCount": 312,
+      "description": "Making Docker and Kubernetes management easy.",
+      "icon": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/portainer/icon.svg",
+      "manifestUrl": "https://raw.githubusercontent.com/orbitr/registry/main/extensions/portainer/manifest.json",
+      "repositoryUrl": "https://github.com/orbitr/extensions/portainer"
+    }
+  ]
+}

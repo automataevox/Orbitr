@@ -1,0 +1,73 @@
+id: portainer
+name: Portainer
+author: Orbitr Team
+description: Portainer is a lightweight management UI for Docker environments.
+type: tool
+version: 2.19.0
+icon: https://www.portainer.io/hubfs/portainer-logo-black.svg
+repository: https://github.com/orbitr/extensions/tree/main/portainer
+tags:
+  - docker
+  - management
+  - ui
+  - monitoring
+
+environment:
+  - name: PORTAINER_ADMIN_PASSWORD
+    label: Admin Password
+    description: Initial admin password (optional, will be set on first login)
+    type: string
+    required: false
+    secret: true
+    default: ""
+
+volumes:
+  - container: /data
+    description: Portainer data directory
+
+ports:
+  - container: 9000
+    host: 9000
+    protocol: tcp
+    description: Portainer web interface
+  - container: 8000
+    host: 8000
+    protocol: tcp
+    description: Edge agent port
+
+healthCheck:
+  type: http
+  endpoint: /api/status
+  port: 9000
+  interval: 30
+  timeout: 10
+  retries: 3
+
+proxyPresets:
+  - subdomain: portainer
+    targetPort: 9000
+    sslEnabled: true
+
+requirements:
+  minMemory: 256
+  minCpu: 0.25
+
+compose:
+  version: "3.8"
+  services:
+    portainer:
+      image: portainer/portainer-ce:2.19.0-alpine
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - portainer_data:/data
+      ports:
+        - "9000:9000"
+        - "8000:8000"
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9000/api/status"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+  volumes:
+    portainer_data:

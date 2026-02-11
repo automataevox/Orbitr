@@ -1,0 +1,86 @@
+{
+  "name": "orbitr",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Docker-native self-hosting orchestration platform",
+  "author": "Orbitr Contributors",
+  "license": "MIT",
+  "homepage": "https://github.com/orbitr/orbitr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbitr/orbitr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/orbitr/orbitr/issues"
+  },
+  "keywords": [
+    "docker",
+    "self-hosting",
+    "orchestration",
+    "homelab",
+    "containers",
+    "extensions"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules .turbo",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
+    "db:generate": "pnpm --filter @orbitr/database db:generate",
+    "db:push": "pnpm --filter @orbitr/database db:push",
+    "db:studio": "pnpm --filter @orbitr/database db:studio",
+    "db:migrate": "pnpm --filter @orbitr/database db:migrate",
+    "docker:build": "docker build -t orbitr/orbitr:latest .",
+    "docker:build:dev": "docker build -f Dockerfile.dev -t orbitr/orbitr:dev .",
+    "docker:run": "docker compose up -d",
+    "docker:stop": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:clean": "docker compose down -v && docker system prune -f",
+    "deploy:prod": "docker compose -f docker-compose.yml up -d",
+    "deploy:dev": "docker compose -f docker-compose.dev.yml up -d",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^15.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "prettier-plugin-tailwindcss": "^0.5.11",
+    "turbo": "^1.12.0",
+    "typescript": "^5.3.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^18.2.48",
+      "@types/react-dom": "^18.2.18"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,mdx}": [
+      "prettier --write"
+    ]
+  }
+}

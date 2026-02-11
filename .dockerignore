@@ -1,0 +1,75 @@
+# Dependencies
+node_modules
+.pnpm-store
+**/node_modules
+
+# Build outputs
+.next
+.turbo
+dist
+build
+out
+**/dist
+**/.next
+**/.turbo
+
+# Development files
+.env*.local
+.env.development
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage
+.nyc_output
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__
+__mocks__
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# Documentation
+*.md
+!README.md
+docs
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# Misc
+.husky
+.editorconfig
+.eslintcache
+.prettierignore
+LICENSE
+
+# Data directories (will be mounted as volumes)
+data
+extensions
+logs
+backups
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore

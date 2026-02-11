@@ -1,0 +1,130 @@
+{
+  "id": "postgresql",
+  "name": "PostgreSQL",
+  "version": "16.1.0",
+  "description": "PostgreSQL is a powerful, open source object-relational database system with over 35 years of active development.",
+  
+  "author": {
+    "name": "Orbitr Team",
+    "email": "extensions@orbitr.io",
+    "url": "https://orbitr.io"
+  },
+  
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbitr/extensions/postgresql"
+  },
+  
+  "type": "app",
+  "categories": ["database"],
+  "tags": ["sql", "postgres", "database", "relational"],
+  
+  "icon": "./icon.svg",
+  "screenshots": [
+    "./screenshots/pgadmin.png"
+  ],
+  
+  "docker": {
+    "compose": "./docker-compose.yml",
+    
+    "images": [
+      "postgres:16-alpine"
+    ],
+    
+    "networks": ["orbitr-network"],
+    
+    "volumes": [
+      {
+        "name": "data",
+        "mountPath": "/var/lib/postgresql/data",
+        "type": "named"
+      }
+    ],
+    
+    "ports": [
+      {
+        "container": 5432,
+        "host": 5432,
+        "protocol": "tcp"
+      }
+    ]
+  },
+  
+  "environment": {
+    "variables": [
+      {
+        "key": "POSTGRES_USER",
+        "label": "Database User",
+        "description": "PostgreSQL superuser name",
+        "type": "string",
+        "default": "postgres",
+        "required": true,
+        "validation": {
+          "pattern": "^[a-z][a-z0-9_]{0,31}$"
+        }
+      },
+      {
+        "key": "POSTGRES_PASSWORD",
+        "label": "Database Password",
+        "description": "PostgreSQL superuser password (minimum 8 characters)",
+        "type": "password",
+        "required": true,
+        "validation": {
+          "min": 8,
+          "max": 128
+        }
+      },
+      {
+        "key": "POSTGRES_DB",
+        "label": "Default Database",
+        "description": "Name of the default database to create on first startup",
+        "type": "string",
+        "default": "orbitr",
+        "required": false
+      },
+      {
+        "key": "PORT",
+        "label": "Host Port",
+        "description": "Port to expose PostgreSQL on the host machine",
+        "type": "number",
+        "default": 5432,
+        "required": false,
+        "validation": {
+          "min": 1024,
+          "max": 65535
+        }
+      }
+    ]
+  },
+  
+  "healthCheck": {
+    "type": "tcp",
+    "interval": 30,
+    "timeout": 5,
+    "retries": 3,
+    "startPeriod": 60,
+    
+    "tcp": {
+      "port": 5432
+    }
+  },
+  
+  "proxy": {
+    "enabled": false
+  },
+  
+  "dependencies": [],
+  
+  "permissions": [
+    "docker.write",
+    "network.create",
+    "volume.create"
+  ],
+  
+  "documentation": {
+    "readme": "./README.md",
+    "website": "https://www.postgresql.org"
+  },
+  
+  "license": "MIT"
+}

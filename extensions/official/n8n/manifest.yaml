@@ -1,0 +1,95 @@
+id: n8n
+name: n8n
+author: Orbitr Team
+description: n8n is a fair-code licensed workflow automation platform.
+type: app
+version: 1.19.0
+icon: https://docs.n8n.io/img/n8n-logo.svg
+repository: https://github.com/orbitr/extensions/tree/main/n8n
+tags:
+  - automation
+  - workflow
+  - integration
+  - no-code
+
+environment:
+  - name: N8N_BASIC_AUTH_ACTIVE
+    label: Enable Basic Auth
+    description: Enable basic authentication
+    type: boolean
+    required: false
+    default: "true"
+
+  - name: N8N_BASIC_AUTH_USER
+    label: Auth Username
+    description: Basic auth username
+    type: string
+    required: false
+    default: "admin"
+
+  - name: N8N_BASIC_AUTH_PASSWORD
+    label: Auth Password
+    description: Basic auth password
+    type: string
+    required: true
+    secret: true
+
+  - name: N8N_HOST
+    label: Webhook Host
+    description: Hostname for webhooks
+    type: string
+    required: false
+    default: "localhost"
+
+volumes:
+  - container: /home/node/.n8n
+    description: n8n data directory
+
+ports:
+  - container: 5678
+    host: 5678
+    protocol: tcp
+    description: n8n web interface
+
+healthCheck:
+  type: http
+  endpoint: /healthz
+  port: 5678
+  interval: 30
+  timeout: 10
+  retries: 3
+
+proxyPresets:
+  - subdomain: n8n
+    targetPort: 5678
+    sslEnabled: true
+
+requirements:
+  minMemory: 512
+  minCpu: 0.5
+
+compose:
+  version: "3.8"
+  services:
+    n8n:
+      image: n8nio/n8n:1.19.0
+      environment:
+        N8N_BASIC_AUTH_ACTIVE: ${N8N_BASIC_AUTH_ACTIVE}
+        N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
+        N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
+        N8N_HOST: ${N8N_HOST}
+        N8N_PROTOCOL: https
+        NODE_ENV: production
+        WEBHOOK_URL: https://${N8N_HOST}/
+      volumes:
+        - n8n_data:/home/node/.n8n
+      ports:
+        - "5678:5678"
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+  volumes:
+    n8n_data:

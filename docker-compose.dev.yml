@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: orbitr-dev
+    restart: unless-stopped
+    
+    ports:
+      - "3000:3000"
+    
+    volumes:
+      # Hot reload
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      
+      # Data persistence
+      - ./data:/app/data
+      - ./extensions:/app/extensions
+      - ./logs:/app/logs
+      
+      # Docker socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      
+      # Node modules (don't sync)
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:/app/data/orbitr.db
+      - PORT=3000
+      - LOG_LEVEL=debug
+      - DOCKER_NETWORK=orbitr-network
+      - PROXY_TYPE=traefik
+    
+    group_add:
+      - ${DOCKER_GID:-999}
+    
+    networks:
+      - orbitr-network
+    
+    command: pnpm dev
+
+  # Prisma Studio for database management
+  prisma-studio:
+    image: node:20-alpine
+    container_name: orbitr-prisma-studio
+    working_dir: /app
+    
+    ports:
+      - "5555:5555"
+    
+    volumes:
+      - ./packages/database:/app
+      - ./data:/data
+    
+    environment:
+      - DATABASE_URL=file:/data/orbitr.db
+    
+    command: npx prisma studio
+    
+    profiles:
+      - tools
+
+networks:
+  orbitr-network:
+    name: orbitr-network
+    external: true

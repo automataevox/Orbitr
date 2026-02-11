@@ -1,0 +1,77 @@
+id: nginx
+name: Nginx
+author: Orbitr Team
+description: Nginx is a high-performance HTTP server, reverse proxy, and load balancer.
+type: app
+version: 1.25.0
+icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg
+repository: https://github.com/orbitr/extensions/tree/main/nginx
+tags:
+  - web-server
+  - reverse-proxy
+  - http
+  - https
+
+environment:
+  - name: NGINX_HOST
+    label: Server Name
+    description: The server name for nginx
+    type: string
+    required: false
+    default: "localhost"
+
+volumes:
+  - container: /usr/share/nginx/html
+    description: Static content directory
+  - container: /etc/nginx/conf.d
+    description: Nginx configuration directory
+
+ports:
+  - container: 80
+    host: 8080
+    protocol: tcp
+    description: HTTP port
+  - container: 443
+    host: 8443
+    protocol: tcp
+    description: HTTPS port
+
+healthCheck:
+  type: http
+  endpoint: /
+  port: 80
+  interval: 30
+  timeout: 10
+  retries: 3
+
+proxyPresets:
+  - subdomain: www
+    targetPort: 80
+    sslEnabled: true
+
+requirements:
+  minMemory: 128
+  minCpu: 0.25
+
+compose:
+  version: "3.8"
+  services:
+    nginx:
+      image: nginx:1.25-alpine
+      environment:
+        NGINX_HOST: ${NGINX_HOST}
+      volumes:
+        - nginx_html:/usr/share/nginx/html
+        - nginx_conf:/etc/nginx/conf.d
+      ports:
+        - "8080:80"
+        - "8443:443"
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+  volumes:
+    nginx_html:
+    nginx_conf:

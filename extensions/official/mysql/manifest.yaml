@@ -1,0 +1,85 @@
+id: mysql
+name: MySQL
+author: Orbitr Team
+description: MySQL is the world's most popular open source relational database.
+type: database
+version: 8.0.0
+icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg
+repository: https://github.com/orbitr/extensions/tree/main/mysql
+tags:
+  - database
+  - sql
+  - relational
+
+environment:
+  - name: MYSQL_ROOT_PASSWORD
+    label: Root Password
+    description: Password for the MySQL root user
+    type: string
+    required: true
+    secret: true
+
+  - name: MYSQL_DATABASE
+    label: Database Name
+    description: Name of the initial database to create
+    type: string
+    required: false
+    default: ""
+
+  - name: MYSQL_USER
+    label: Username
+    description: MySQL user to create
+    type: string
+    required: false
+    default: ""
+
+  - name: MYSQL_PASSWORD
+    label: User Password
+    description: Password for the MySQL user
+    type: string
+    required: false
+    secret: true
+
+volumes:
+  - container: /var/lib/mysql
+    description: MySQL data directory
+
+ports:
+  - container: 3306
+    host: 3306
+    protocol: tcp
+    description: MySQL server port
+
+healthCheck:
+  type: command
+  command: mysqladmin ping -h localhost
+  interval: 30
+  timeout: 10
+  retries: 3
+
+requirements:
+  minMemory: 512
+  minCpu: 0.5
+
+compose:
+  version: "3.8"
+  services:
+    mysql:
+      image: mysql:8.0
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      volumes:
+        - mysql_data:/var/lib/mysql
+      ports:
+        - "3306:3306"
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+  volumes:
+    mysql_data:

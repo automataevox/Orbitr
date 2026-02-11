@@ -1,0 +1,65 @@
+id: redis
+name: Redis
+author: Orbitr Team
+description: Redis is an open source, in-memory data structure store, used as a database, cache, and message broker.
+type: database
+version: 7.2.0
+icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg
+repository: https://github.com/orbitr/extensions/tree/main/redis
+tags:
+  - database
+  - cache
+  - key-value
+  - in-memory
+
+environment:
+  - name: REDIS_PASSWORD
+    label: Password
+    description: Password for Redis authentication (leave empty for no auth)
+    type: string
+    required: false
+    secret: true
+    default: ""
+
+volumes:
+  - container: /data
+    description: Redis persistence directory
+
+ports:
+  - container: 6379
+    host: 6379
+    protocol: tcp
+    description: Redis server port
+
+healthCheck:
+  type: command
+  command: redis-cli ping
+  interval: 30
+  timeout: 10
+  retries: 3
+
+requirements:
+  minMemory: 256
+  minCpu: 0.25
+
+compose:
+  version: "3.8"
+  services:
+    redis:
+      image: redis:7.2-alpine
+      command: >
+        redis-server
+        --requirepass ${REDIS_PASSWORD:-}
+        --appendonly yes
+      volumes:
+        - redis_data:/data
+      ports:
+        - "6379:6379"
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+  volumes:
+    redis_data:
