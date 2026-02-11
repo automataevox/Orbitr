@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="./docs/assets/logo.svg" alt="Orbitr Logo" width="200"/>
+<img src="./docs/assets/logo.png" alt="Orbitr Logo" width="200"/>
 
 **A Docker-native self-hosting orchestration platform**
 
