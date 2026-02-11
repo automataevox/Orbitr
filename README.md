@@ -97,7 +97,7 @@ Orbitr is a **production-ready self-hosting platform** that makes running Docker
 
 ```bash
 # Clone repository
-git clone https://github.com/orbitr/orbitr.git
+git clone https://github.com/automataevox/orbitr.git
 cd orbitr
 
 # Configure environment
@@ -117,7 +117,7 @@ pnpm deploy:prod
 
 ```bash
 # Clone repository
-git clone https://github.com/orbitr/orbitr.git
+git clone https://github.com/automataevox/orbitr.git
 cd orbitr
 
 # Install dependencies
@@ -253,7 +253,7 @@ Orbitr is built with a modular, extensible architecture:
 
 ```bash
 # Clone repository
-git clone https://github.com/orbitr/orbitr.git
+git clone https://github.com/automataevox/orbitr.git
 cd orbitr
 
 # Install dependencies
